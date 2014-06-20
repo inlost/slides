@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Yes Cache</title>
+    <link href="css/style.css" rel="stylesheet" />
+</head>
+<body>
+
+<div id="impress">
+
+    <div class="step slide" data-x="-2200" data-y="-1500">
+        <p>没有花活，直入正题，上干货<br/><br/><br/><b>所以!!!</b></p>
+    </div>
+    <div class="step slide" data-x="-1000" data-y="-1500">
+        <p>引子来了!<br/>尼玛访问<b>速度</b>怎么这么<b>慢</b>啊？！<br/>
+            <b>别人</b>的网站为什么可以<b>秒开</b>啊？！！<br/>
+            这么点儿并发服务器的带宽就不够用了,<b>一兆带宽一寸金</b>啊！<br/><br/>
+            无下限的<b>沮丧</b>有木有<b>！！</b></p>
+    </div>
+    <div class="step slide" data-x="100" data-y="-1500">
+        <p>减轻客户流量负担、减少服务器带宽开销、提高网络服务质量、增强网络信息可用性以及提高网络灵活性、<br/><br/><br/><br/>还有……<b>速度！！！</b></p>
+    </div>
+    <div class="step slide" data-x="1200" data-y="-1500">
+        <ul>
+            <li>If-Modified-Since</li>
+            <li>Cache-Control: max-age=0</li>
+            <li>Last-Modified</li>
+            <li>304 Not Modified</li>
+            <li>ETag: "20b1add7ec1cd1:0"</li>
+            <li>Chromebook好像很酷</li>
+        </ul>
+        <p>这都是些<b>啥</b>？</p>
+    </div>
+    <div id="title" class="step" data-x="-1000" data-y="-500" data-rotate="320" data-scale="3">
+        <span class="try">Speed The Web</span>
+        <h1>Cache <sup>*</sup></h1>
+        <h3>加速网络世界的缓存们</h3>
+        <span class="footnote"><sup>*</sup> Colin.Li @ HunterOn</span>
+    </div>
+    <div id="cat-http" class="step" data-x="3500" data-y="2100" data-rotate="180" data-scale="6">
+        <h1>http缓存</h1>
+        <ul class="catlist">
+            <li>Expires策略</li>
+            <li>Cache-control策略</li>
+            <li>
+                <ul>
+                    <li>Cache-control header</li>
+                    <li>Last-Modified && If-Modified-Since</li>
+                    <li>Etag && If-None-Match</li>
+                </ul>
+            </li>
+            <li>与缓存相关的http请求头（header）</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="2000" data-y="2100">
+        <h1>Expires策略</h1>
+        <p class="text-small">Expires是Web服务器响应消息头字段，在响应http请求时告诉浏览器在过期时间前浏览器可以直接从浏览器缓存取数据，而无需再次请求。</p>
+        <img src="images/1.png" alt="">
+    </div>
+    <div class="step slide" data-x="940" data-y="2100">
+        <h1>Cache-control headers</h1>
+        <p class="text-small">Cache-Control与Expires的作用一致，都是指明当前资源的有效期，控制浏览器是否直接从浏览器缓存取数据还是重新发请求到服务器取数据。只不过Cache-Control的选择更多，设置更细致，如果同时设置的话，其优先级高于Expires。</p>
+        <ul class="list-small">
+            <li>Public:响应可被任何缓存区缓存</li>
+            <li>Private:缓存与用户相关</li>
+            <li>max-age:多少秒内访问不会请求服务器</li>
+            <li>no-cache:每次都去服务器验证</li>
+            <li>no-store:每次都请求新鲜的资源</li>
+            <li>min-fresh:未来多少秒内保持文档新鲜</li>
+            <li>max-stale:缓存超时</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="-120" data-y="2100">
+        <h1>Last-Modified && If-Modified-Since：</h1>
+        <ul class="list-small">
+            <li>Last-Modified:最后修改时间</li>
+            <li>If-Modified-Since:max-age到期后，如果缓存资源有Last-Modified属性，则向服务器发送If-Modified-Since.</li>
+        <p class="text-small">If-Modified-Since需要和max-age,Last-Modified配合使用，如果服务器发现文件的最后修改时间小于等于If-Modified-Since则会返回304</p>
+        </ul>
+    </div>
+    <div class="step slide" data-x="-1180" data-y="2100">
+        <h1>Etag && If-None-Match</h1>
+        <ul class="list-small">
+            <li>Etag:资源在服务器的唯一标识</li>
+            <li>If-None-Match:max-age到期后，如果缓存资源有Etage属性，则向服务器发送If-None-Match.</li>
+        </ul>
+        <p class="text-small">If-None-Match需要和max-age,Etag配合使用，如果服务器发现文件的标识等于Etag则会返回304</p>
+    </div>
+    <div class="step slide" data-x="-2240" data-y="2100">
+        <h1>与缓存相关的http请求头 总结</h1>
+        <ul class="list-small">
+            <li>Cache-Control</li>
+            <li>If-Modified-Since</li>
+            <li>If-None-Match</li>
+            <li>Cache-Control</li>
+            <li>Pragma</li>
+        </ul>
+        <ul class="list-small">
+            <li>Cache-Control</li>
+            <li>Date</li>
+            <li>Expires</li>
+            <li>Last-Modified</li>
+            <li>ETag</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="-3300" data-y="2100">
+        <h1>一点PS</h1>
+        <p class="text-small">在浏览器上点击刷新按钮、按Ctrl+F5刷新和输入网址后按回车键，使用的是不同的缓存机制，具体如下：</p>
+        <ul class="list-small">
+            <li>按刷新按钮：需要到服务器检查页面对象是否过期，不过期则使用缓存</li>
+            <li>按Ctrl+F5：强制刷新，不使用缓存，请求头中会有no-cache标签</li>
+            <li>输入网址后按回车：如果本地缓存存在并未过期，则直接使用而无需请求服务器</li>
+        </ul>
+        <p class="text-small">Pragma:no-cache是HTTP1.0里定义的header，与Cache-control:no-cache同意</p>
+    </div>
+    <div id="cat-html5" class="step" data-x="500" data-y="-100" data-rotate="180" data-scale="6">
+        <h1>HTML5离线缓存</h1>
+        <ul class="catlist">
+            <li>manifest TAG</li>
+            <li>manifest文件规则</li>
+            <li>applicationCache</li>
+                <ul>
+                    <li>applicationCache 状态</li>
+                    <li>applicationCache 方法</li>
+                    <li>applicationCache 事件</li>
+                </ul>
+        </ul>
+    </div>
+    <div class="step slide" data-x="3900" data-y="-100">
+        <h1>manifest TAG</h1>
+        <p class="text-small">&lt;html lang="zh-CN" <b>manifest='test.manifest'</b>&gt;</p>
+        <p class="text-small">MIME TYPE:text/cache-manifest</p>
+        <p class="text-small">引用cache.manifest的html文档会被默认包含进缓存清单</p>
+    </div>
+    <div class="step slide" data-x="4950" data-y="-100">
+        <h1>manifest文件规则</h1>
+        <p class="text-small">CACHE MANIFEST #文件头</p>
+        <p class="text-small">CACHE: #直接缓存的文件</p>
+        <p class="text-small">NETWORK: #需要时在线的文件</p>
+        <p class="text-small">FALLBACK: #在线资源离线替代资源</p>
+    </div>
+    <div class="step slide" data-x="6000" data-y="-100">
+        <h1>window.applicationCache.status</h1>
+        <ul class="list-small">
+            <li>UNCACHED === 0 | 未缓存</li>
+            <li>IDLE === 1 | 空闲，缓存更新完毕</li>
+            <li>CHECKING === 2 | 检查缓存是否需要更新</li>
+            <li>DOWNLOADING === 3 | 正在更新缓存文件</li>
+            <li>UPDATEREADY === 4 | 中间态，更新完成</li>
+            <li>OBSOLETE === 5 | 缓存过期</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="7050" data-y="-100">
+        <h1>applicationCache API</h1>
+        <ul class="list-small">
+            <li>cache.update() 手动更新缓存</li>
+            <li>cache.abort() 取消正在进行的缓存更新</li>
+            <li>cache.swapCache() 在本次回话中使用已经update过的缓存</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="8100" data-y="-100">
+        <h1>applicationCache Event</h1>
+        <ul class="list-small">
+            <li>checking 手动更新缓存</li>
+            <li>noupdate manifest无更新</li>
+            <li>downloading 下载</li>
+            <li>progress 手动更新缓存</li>
+            <li>cached 缓存最新</li>
+            <li>updateready 更新成功</li>
+            <li>obsolete 404 410 取消缓存</li>
+            <li>error 出错</li>
+        </ul>
+    </div>
+    <div id="overview" class="step" data-x="3000" data-y="1500" data-scale="10">
+    </div>
+
+</div>
+
+<script src="js/impress.js"></script>
+<script>impress().init();</script>
+
+</body>
+</html>

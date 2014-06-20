@@ -1,0 +1,298 @@
+<!--
+Google IO 2012/2013 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/setup1_bg.jpg"></span>
+    </article>
+  </slide>
+
+  <slide class="title-slide segue nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>微信怎么有意思？</h2>
+    </hgroup>
+    <article>
+      <ul class="build">
+        <li>微信改变了什么，它成就了腾讯，威胁了阿里，可是是谁成就了它</li>
+        <li>
+            <img src="images/bl_qr.png" alt="" />
+            <img style="height:380px;" src="images/airplane.jpg" alt="" />
+        </li>
+        <li>是公众号们么？是开发者们么？还是……</li>
+        <li>其实上面这些问题都和今天的分享没有关系！</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>怎么开始</h2>
+      <h3>Getting started</h3>
+    </hgroup>
+    <article>
+        <aside class="note">
+          <section>
+            <ul>
+              <li>订阅号没有<span class="red">高级接口</span>但能每天都群发一条消息</li>
+              <li>服务号一个月只呢发一条消息但有<span class="red">高级接口</span></li>
+              <li><span class="red">所以说！高级接口这货是谁啊？！</span></li>
+            </ul>
+            <p><b>这个，官人莫要心急，我们慢慢来</b></p>
+          </section>
+        </aside>
+
+      <p>开始建设一个订阅号</p>
+      <ul class="build">
+        <li>注册一个订阅号</li>
+        <li>设置头像名字介绍</li>
+        <li>吃饭、睡觉、打豆豆……Loop</li>
+        <li>其实是：宣传、运营、发内容……Loop</li>
+        <li>准备一个微博，并认证它</li>
+        <li>等到有500粉的时候无痛成为低级认证公众号</li>
+        <li>土豪玩儿法：准备300大洋和一堆资料变成高级认证公众号<span style="color:red">(有自定义菜单哦亲)</span></li>
+      </ul>
+      <p>开始建设一个服务号</p>
+      <ul class="build">
+        <li>土豪玩儿法：准备300大洋和一堆资料变成高级认证公众号<span style="color:red">(有全部高级接口和自定义菜单哦)</span></li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>高级api接口能超能力</h2>
+    </hgroup>
+    <article>
+      <ul class="build fade">
+        <li>能知道你再用wifi还是手机流量上网</li>
+        <li>能知道你在哪里</li>
+        <li>听得懂你的语音消息</li>
+        <li>可以自动创建粉丝分组</li>
+        <li class="red">可以创建带有参数的二维码</li>
+        <li class="red">可以使用客服接口主动向用户发送消息</li>
+        <li class="red">比订阅号更方便的把移动网页接入微信</li>
+        <li class="red">可以获取详尽精确的用户行为统计信息</li>
+        <li class="red">没错！只要300RMB！！！你就能全部拥有！</li>
+        <li>So,让我们开始吧</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide hidden>
+    Hidden slides are left out of the presentation.
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>开启开发者模式</h2>
+      <h3>接入微信，准备开发</h3>
+    </hgroup>
+    <article>
+      <p>填写好url，token，原样输出一个参数，就好了～</p>
+      <pre class="prettyprint" data-lang="javascript">
+&lt;script type='text/javascript'&gt;
+  /*接入时，微信会发一个GET请求到所填写的url上
+    请求会携带signature，timestamp，nonce，echostr四个参数
+    signature= token,timestamp,nonce字典排序后用sha1加密
+    如果值相等，则输出echostr，微信即会认为接入成功,并开启开发者模式*/
+
+  weixin=function(req, res){
+      <b>//所以，想要拥有超能力，有这一句就够了！
+      res.send(req.query.echostr);</b>
+  };
+
+&lt;/script&gt;
+</pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>超能力字典</h2>
+    </hgroup>
+    <article>
+      <iframe data-src="http://mp.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5"></iframe>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+        <article class="smaller">
+            <pre class="prettyprint" data-lang="javascript">
+// 发送给好友;
+WeixinJSBridge.on('menu:share:appmessage', function(argv){});
+// 分享到朋友圈;
+WeixinJSBridge.on('menu:share:timeline', function(argv){});
+// 分享到微博;
+WeixinJSBridge.on('menu:share:weibo', function(argv){});
+// 分享到Facebook
+WeixinJSBridge.on('menu:share:facebook', function(argv){});
+// 尚未开放
+WeixinJSBridge.on('menu:general:share', function(argv){});
+            </pre>
+        </article>
+    </aside>
+
+    <hgroup>
+      <h2>官方字典里不会说的黑魔法</h2>
+    </hgroup>
+    <article class="smaller">
+      <pre class="prettyprint" data-lang="javascript">
+<b>WeixinJSBridge.on('menu:share:appmessage', function(argv){</b>
+    WeixinJSBridge.invoke('sendAppMessage', {
+        "appid": dataForWeixin.appId,
+        "img_url": dataForWeixin.TLImg,
+        "img_width": "120",
+        "img_height": "120",
+        "link": dataForWeixin.url + '&r=share',
+        "title": dataForWeixin.title,
+        "desc": dataForWeixin.desc
+    });
+});
+<b>WeixinJSBridge.on('menu:share:timeline', function(argv){</b>
+    WeixinJSBridge.invoke('shareTimeline', {
+        "appid": dataForWeixin.appId,
+        "img_url":dataForWeixin.TLImg,
+        "img_width": "120",
+        "img_height": "120",
+        "link": dataForWeixin.url + '&r=share',
+        "title": dataForWeixin.title,
+        "desc": dataForWeixin.desc
+    });
+});
+</pre>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+        <article class="smaller">
+            <pre class="prettyprint" data-lang="javascript">
+//不使用事件代理
+<b>$("td").on("click",function(){</b>
+    alert(this.innerHTML);
+});
+//使用事件代理
+<b>$("table").on("click",function(e){
+    var target = e.target;
+    if(target.tagName.toLowerCase() == "td"){</b>
+        alert(target.innerHTML);
+    }
+});
+            </pre>
+        </article>
+    </aside>
+
+    <hgroup>
+      <h2>移动——力量，移动——性能</h2>
+    </hgroup>
+    <article class="small">
+      <p>加载性能优化, 达到打开足够快</p>
+      <ul class="build">
+        <li>数据离线化，考虑将数据缓存在 localStorage</li>
+        <li>初始请求资源数<span class="red"> < 4 </span></li>
+        <li>图片使用CSS Sprites 或 DATAURI</li>
+        <li>初始首屏之外的图片资源需延迟加载</li>
+      </ul>
+      <p>运行性能优化, 达到操作足够流畅</p>
+      <ul class="build">
+        <li class="red">避免 <a href="http://thx.github.io/mobile/300ms-click-delay/" target="_blank">iOS 300+ms 点击延时问题</a></li>
+        <li>缓存 DOM 选择与计算</li>
+        <li>尽可能使用事件代理，避免批量绑定事件</li>
+        <li>HTML结构层级保持足够简单，推荐不超过 5 个层级</li>
+        <li>使用CSS3动画代替JS动画</li>
+        <li>尽能少的使用CSS高级选择器与通配选择器</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide class="segue dark nobackground">
+    <aside class="gdbar"><img src="images/google_developers_icon_128.png"></aside>
+    <hgroup class="auto-fadein">
+      <h2>所以，有问题的同学请提问</h2>
+      <h3>这是讲完了么？？？</h3>
+    </hgroup>
+  </slide>
+
+  <slide class="segue dark quote nobackground">
+    <aside class="gdbar right bottom"><img src="images/google_developers_icon_128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <q>
+        首先你要了解人们的欲望，然后通过你的产品去满足，
+      </q>
+      <p style="text-align:right;">——张小龙</p>
+      <div class="author">
+        Colin.Li<br>
+        HunterOn
+      </div>
+    </article>
+  </slide>
+
+  <slide class="thank-you-slide segue nobackground">
+    <aside class="gdbar right"><img src="images/google_developers_icon_128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <h2>&lt;Thank You!&gt;</h2>
+      <p>Important contact information goes here.</p>
+    </article>
+    <p class="auto-fadein" data-config-contact>
+      <!-- populated from slide_config.json -->
+    </p>
+  </slide>
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
