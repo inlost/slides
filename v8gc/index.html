@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>V8 GC</title>
+    <link href="../css/style.css" rel="stylesheet" />
+    <style type='text/css'>
+        .tid76{
+            text-indent:76px;
+        }
+        .pl126{
+            padding-left:126px;
+        }
+        .smallList{
+            font-size:20px;
+        }
+        .normalList{
+            font-size:30px;
+        }
+        .text-small{
+            font-size:18px;
+        }
+        .webkit_vs_v8,
+        .stack{
+            position:relative;
+        }
+        .webkit_vs_v8 .smallList{
+            position:absolute;
+            left:632px;
+            top:180px;
+        }
+        .stack .text-small{
+            width:600px;
+        }
+        .stack .list-small{
+            position:absolute;
+            top:120px;
+            right:40px;
+        }
+        .stack img{
+            position:absolute;
+            right:20px;
+            top:330px;
+        }
+        .cheney-example{
+            width:100%;
+            height:360px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="impress">
+
+    <div class="step slide" data-x="-2200" data-y="-1500">
+        <p>没有花活，直入正题，上干货<br/><br/><br/><b>所以!!!</b></p>
+    </div>
+    <div class="step slide" data-x="-1000" data-y="-1500">
+        <p>引子来了!</p>
+        <ul>
+            <li>webkit 和 v8 之间有什么样的基情？</li>
+            <li>为什么v8一个线程职能使用1.4g／0.7g的内存？</li>
+            <li>分代回收是什么？</li>
+        </ul>
+    </div>
+    <div id="title" class="step" data-x="-1000" data-y="500" data-rotate="320" data-scale="3">
+        <span class="try">Speed The Web</span>
+        <h1>v8 GC <sup>*</sup></h1>
+        <h3>v8速度的秘密——v8内存管理与垃圾回收</h3>
+        <span class="footnote"><sup>*</sup> Colin.Li @ HunterOn</span>
+    </div>
+    <div class="step webkit_vs_v8 slide" data-x="100" data-y="-1500">
+        <h2>webkit和Chrome和v8</h2>
+        <img src="images/webkit_v8.jpeg" alt="vebkit vs v8" style="height:350px;"/>
+        <ul class="smallList">
+            <li>webkit = webCore + JSCore</li>
+            <li>Chrome继承了webkit的webCore</li>
+            <li>v8是Chrome的JSCore</li>
+            <li>v8 ≈ webkit的webCore + v8</li>
+            <li>Webkit Glue是一个中间层</li>
+        </ul>
+    </div>
+    <div class="step slide stack" data-x="1200" data-y="-1500">
+        <h2>v8的堆</h2>
+        <p class="text-small">每个区域都是由一组内存页构成，内存页是V8申请内存的最小单位，除了大对象区的内存页较大以外，其他区的内存页都是1MB大小，而且按照1MB对齐。内存页除了存储的对象，还有一个包含元数据和标识信息的页头，以及一个用于标记哪些对象是活跃对象的位图区。另外每个内存页还有一个单独分配在另外内存区的槽缓冲区，里面放着一组对象，这些对象可能指向其他存储在该页的对象。垃圾回收器只会针对新生代内存区、老生代指针区以及老生代数据区进行垃圾回收</p>
+        <ul class="list-small">
+            <li><b>新生代内存区</b></li>
+            <li><b>老生代指针区</b></li>
+            <li><b>老生代数据区</b></li>
+            <li>大对象区</li>
+            <li>代码区</li>
+            <li>Cell区、属性Cell区、Map区</li>
+        </ul>
+        <img src="images/memoryUsage.png" alt="">
+    </div>
+    <div class="step slide" data-x="2260" data-y="-1500">
+        <h2>精确的垃圾回收和保守的垃圾回收</h2>
+        <h3 class="text-small"><b>Garbage collection</b> 精确的垃圾回收 <b>V8,java…</b></h3>
+        <ul class="list-small">
+            <li><b>分代(Generational)</b></li>
+            <li><b>复制(copy)</b></li>
+        </ul>
+        <h3 class="text-small"><b>conservative collection</b> 保守的垃圾回收 <b>python,ruby…</b></h3>
+        <ul class="list-small">
+            <li>标记清除(mark and sweep)</li>
+            <li>引用计数(reference counting)</li>
+        </ul>
+    </div>
+    <div id="cat-http" class="step" data-x="3500" data-y="2100" data-rotate="180" data-scale="6">
+        <h2>v8的垃圾回收</h2>
+        <ul class="catlist">
+            <li>分代垃圾回收</li>
+            <li>Scavenge 之 Cheney算法</li>
+            <li>Mark Sweep & Mark Compact</li>
+            <li>写屏障</li>
+            <li>Incremental Marking & Lazy Sweeping</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="2000" data-y="2100">
+        <h2>分代垃圾回收</h2>
+        <p class="text-small">对象的生存周期不一，不同算法针对特定情况才有最好的效果，所以按照对象的存活时间将内存堆进行分代，分别对不同的分代实施最有效的算法</p>
+        <p class="text-small"><b>新生代</b><br/>16MB-32MB/8MB-16MB,清理频繁,所在对象生存周期短,完整gc周期短(毫级级)</p>
+        <p class="text-small"><b>老生代</b><br/>1400MB/700MB,不频繁清理,所在对象生命周期长,完整gc执行周期长(秒级)</p>
+    </div>
+    <div class="step slide" data-x="940" data-y="2100">
+        <h2>Scavenge 之 <a href="http://en.wikipedia.org/wiki/Cheney's_algorithm" target="_blank">Cheney算法</a></h2>
+        <p class="text-small">Cheney算法算法是一种采用复制的方式实现的垃圾回收算法。它将内存一分为二，每一部分空间称为semispace。在这两个semispace中，一个处于使用状态，另一个处于闲置状态。处于使用状态的semispace空间称为From空间，处于闲置状态的空间称为To空间，当我们分配对象时，先是在From空间中进行分配。当开始进行垃圾回收算法时，会检查From空间中的存活对象，这些存活对象将会被复制到To空间中（复制完成后会进行紧缩），而非活跃对象占用的空间将会被释放。完成复制后，From空间和To空间的角色发生对换。也就是说，在垃圾回收的过程中，就是通过将存活对象在两个semispace之间进行复制。可以很容易看出来，使用Cheney算法时，总有一半的内存是空的。但是由于新生代很小，所以浪费的内存空间并不大。而且由于新生代中的对象绝大部分都是非活跃对象，需要复制的活跃对象比例很小，所以其时间效率十分理想。复制的过程采用的是BFS（广度优先遍历）的思想，从根对象出发，广度优先遍历所有能到达的对象</p>
+    </div>
+    <div class="step slide" data-x="-120" data-y="2100">
+        <h3>具体实现</h3>
+        <p class="text-small">首先将From空间中所有能从根对象到达的对象复制到To区，然后维护两个To区的指针scanPtr和allocationPtr，分别指向即将扫描的活跃对象和即将为新对象分配内存的地方，开始循环。循环的每一轮会查找当前scanPtr所指向的对象，确定对象内部的每个指针指向哪里。如果指向老生代我们就不必考虑它了。如果指向From区，我们就需要把这个所指向的对象从From区复制到To区，具体复制的位置就是allocationPtr所指向的位置。复制完成后将scanPtr所指对象内的指针修改为新复制对象存放的地址，并移动allocationPtr。如果一个对象内部的所有指针都被处理完，scanPtr就会向前移动，进入下一个循环。若scanPtr和allocationPtr相遇，则说明所有的对象都已被复制完，From区剩下的都可以被视为垃圾，可以进行清理了</p>
+    </div>
+    <div class="step slide" data-x="-1180" data-y="2100">
+        <h3>举个栗子</h3>
+        <div class="text-small tid76">+----- A对象</div>
+        <div class="text-small tid76">|</div>
+        <div class="text-small">根对象----+----- B对象 ------ E对象</div>
+        <div class="text-small tid76">|</div>
+        <div class="text-small tid76">+----- C对象 ----+---- F对象 </div>
+        <div class="text-small tid76 pl126">|</div>
+        <div class="text-small tid76 pl126">+---- G对象 ----- H对象</div>
+        <div class="text-small">D对象</div>
+    </div>
+    <div class="step slide" data-x="-2240" data-y="2100">
+        <a class="text-small" href="cheney_example.txt" target="_blank">点我在新窗口打开下面的栗子</a>
+        <iframe class="cheney-example" src="cheney_example.txt" frameborder="0"></iframe>
+        <a class="text-small" href="http://jianshu.io/p/74659de07264" target="_blank">Cheney(半区复制)算法</a>
+    </div>
+    <div class="step slide" data-x="-3300" data-y="2100">
+        <h3>对象的晋升</h3>
+        <p class="text-small">当一个对象经过多次新生代的清理依旧幸存，这说明它的生存周期较长，也就会被移动到老生代，这称为对象的晋升。具体移动的标准有两种：</p>
+        <ul class="list-small">
+            <li>对象从From空间复制到To空间时，会检查它的内存地址来判断这个对象是否已经经历过一个新生代的清理，如果是，则复制到老生代中，否则复制到To空间中</li>
+            <li>对象从From空间复制到To空间时，如果To空间已经被使用了超过25%，那么这个对象直接被复制到老生代</li>
+        </ul>
+    </div>
+    <div id="cat-html5" class="step" data-x="500" data-y="-100" data-rotate="180" data-scale="6">
+        <h3>老生代的垃圾回收</h3>
+        <ul class="catlist">
+            <li>Mark-Sweep（标记清除）</li>
+            <li>Mark-Compact（标记整理）</li>
+            <li>综合实现</li>
+            <li>v8的一些优化</li>
+        </ul>
+    </div>
+    <div class="step slide" data-x="3900" data-y="-100">
+        <h4>Mark-Sweep（标记清除）</h4>
+        <p class="text-small">标记清除分为标记和清除两个阶段。在标记阶段需要遍历堆中的所有对象，并标记那些活着的对象，然后进入清除阶段。在清除阶段总，只清除没有被标记的对象。由于标记清除只清除死亡对象，而死亡对象在老生代中占用的比例很小，所以效率较高</p>
+        <p class="text-small">标记清除有一个问题就是进行一次标记清楚后，内存空间往往是不连续的，会出现很多的内存碎片。如果后续需要分配一个需要内存空间较多的对象时，如果所有的内存碎片都不够用，将会使得V8无法完成这次分配，提前触发垃圾回收。</p>
+    </div>
+    <div class="step slide" data-x="4950" data-y="-100">
+        <h4>Mark-Compact（标记整理）</h4>
+        <p class="text-small">标记整理正是为了解决标记清除所带来的内存碎片的问题。标记整理在标记清除的基础进行修改，将其的清除阶段变为紧缩极端。在整理的过程中，将活着的对象向内存区的一段移动，移动完成后直接清理掉边界外的内存。紧缩过程涉及对象的移动，所以效率并不是太好，但是能保证不会生成内存碎片</p>
+    </div>
+    <div class="step slide" data-x="6000" data-y="-100">
+        <h4>综合实现</h4>
+        <p class="text-small">标记清除和标记整理都分为两个阶段：标记阶段、清除或紧缩阶段</p>
+        <p class="text-small">在标记阶段，所有堆上的活跃对象都会被标记。每个内存页有一个用来标记对象的位图，位图中的每一位对应内存页中的一个字。这个位图需要占据一定的空间（32位下为3.1%，64位为1.6%）。另外有两位用来标记对象的状态，这个状态一共有三种（所以要两位）——白，灰，黑：</p>
+        <ul class="list-small">
+            <li>如果一个对象为白对象，它还没未被垃圾回收器发现</li>
+            <li>如果一个对象为灰对象，它已经被垃圾回收器发现，但其邻接对象尚未全部处理</li>
+            <li>如果一个对象为黑对象，说明他步进被垃圾回收器发现，其邻接对象也全部被处理完毕了</li>
+        </ul>
+        <p class="text-small">V8的老生代使用标记清除和标记整理结合的方式，主要采用标记清除算法，如果空间不足以分配从新生代晋升过来的对象时，才使用标记整理</p>
+    </div>
+    <div class="step slide" data-x="7050" data-y="-100">
+        <h4>补充1</h4>
+        <p class="text-small">如果将对中的对象看做由指针做边的有向图，标记算法的核心就是深度优先搜索。在初始时，位图为空，所有的对象也都是白对象。从根对象到达的对象会背染色为灰色，放入一个单独的双端队列中。标记阶段的每次循环，垃圾回收器都会从双端队列中取出一个对象并将其转变为黑对象，并将其邻接的对象转变为灰，然后把其邻接对象放入双端队列。如果双端队列为空或所有对象都变成黑对象，则结束。特别大的对象，可能会在处理时进行分片，防止双端队列溢出。如果双端队列溢出，则对象仍然会成为灰对象，但不会被放入队列中，这将导致其邻接对象无法被转变为灰对象。所以在双端队列为空时，需要扫描所有对象，如果仍有灰对象，将它们重新放入队列中进行处理。标记结束后，所有的对象都应该非黑即白，白对象将成为垃圾，等待释放</p>
+        <p class="text-small">清除和紧缩阶段都是以内存页为单位回收内存</p>
+    </div>
+    <div class="step slide" data-x="8100" data-y="-100">
+        <h4>补充2</h4>
+        <p class="text-small">清除时垃圾回收器会扫描连续存放的死对象，将其变成空闲空间，并保存到一个空闲空间的链表中。这个链表常被scavenge算法用于分配被晋升对象的内存，但也被紧缩算法用于移动对象</p>
+        <p class="text-small">紧缩算法会尝试将碎片页整合到一起来释放内存。由于页上的对象会被移动到新的页上，需要重新分配一些页。大致过程是，对目标碎片页中的每个活跃对象，在空闲内存链表中分配一块内存页，将该对象复制过去，并在碎片页中的该对象上写上新的内存地址。随后在迁出过程中，对象的旧地址将会被记录下来，在迁出结束后，V8会遍历所有它所记录的旧对象的地址，将其更新为新地址。由于标记过程中也记录了不同页之间的指针，这些指针在此时也会进行更新。如果一个页非常活跃，如其中有过多需要记录的指针，那么地址记录会跳过它，等到下一轮垃圾回收进行处理</p>
+    </div>
+    <div class="step slide" data-x="3900" data-y="600">
+        <h4>Incremental Marking（增量标记）</h4>
+        <p class="text-small">由于全停顿会造成了浏览器一段时间无响应，所以V8使用了一种增量标记的方式，将完整的标记拆分成很多部分，每做完一部分就停下来，让JS的应用逻辑执行一会，这样垃圾回收与应用逻辑交替完成。经过增量标记的改进后，垃圾回收的最大停顿时间可以减少到原来的1/6左右</p>
+        <h4>Lazy Sweeping（惰性清理）</h4>
+        <p class="text-small">由于全停顿会造成了浏览器一段时间无响应，所以V8使用了一种增量标记的方式，将完整的标记拆分成很多部分，每做完一部分就停下来，让JS的应用逻辑执行一会，这样垃圾回收与应用逻辑交替完成。经过增量标记的改进后，垃圾回收的最大停顿时间可以减少到原来的1/6左右</p>
+    </div>
+    <div class="step slide" data-x="4950" data-y="600">
+        <h4>写屏障</h4>
+        <p class="text-small">上面有一个细节被忽略了：如果新生区中某个对象，只有一个指向它的指针，而这个指针恰好是在老生区的对象当中，我们如何才能知道新生区中那个对象是活跃的呢？显然我们并不希望将老生区再遍历一次，因为老生区中的对象很多，这样做一次消耗太大。</p>
+        <p class="text-small">为了解决这个问题，实际上在写缓冲区中有一个列表，列表中记录了所有老生区对象指向新生区的情况。新对象诞生的时候，并不会有指向它的指针，而当有老生区中的对象出现指向新生区对象的指针时，我们便记录下来这样的跨区指向。由于这种记录行为总是发生在写操作时，它被称为写屏障——因为每个写操作都要经历这样一关。</p>
+    </div>
+    <div class="step" data-x="5000" data-y="-1580" data-scale="3" data-rotate="180">
+        <span class="try">Speed The Web</span>
+        <h2>THE END <sup>*</sup></h2>
+        <h3>Thank you</h3>
+        <span class="footnote"><sup>*</sup> Colin.Li @ HunterOn</span>
+    </div>
+    <div id="overview" class="step" data-x="3000" data-y="1500" data-scale="10">
+    </div>
+
+</div>
+
+<script src="../js/impress.js"></script>
+<script>impress().init();</script>
+
+</body>
+</html>
