@@ -38,7 +38,7 @@
         <span class="try">Speed The Web</span>
         <h1>Cache <sup>*</sup></h1>
         <h3>加速网络世界的缓存们</h3>
-        <span class="footnote"><sup>*</sup> Colin.Li @ HunterOn</span>
+        <span class="footnote"><sup>*</sup> Colin.Li </span>
     </div>
     <div id="cat-http" class="step" data-x="3500" data-y="2100" data-rotate="180" data-scale="6">
         <h1>http缓存</h1>
@@ -116,62 +116,53 @@
         </ul>
         <p class="text-small">Pragma:no-cache是HTTP1.0里定义的header，与Cache-control:no-cache同意</p>
     </div>
-    <div id="cat-html5" class="step" data-x="500" data-y="-100" data-rotate="180" data-scale="6">
-        <h1>HTML5离线缓存</h1>
-        <ul class="catlist">
-            <li>manifest TAG</li>
-            <li>manifest文件规则</li>
-            <li>applicationCache</li>
-                <ul>
-                    <li>applicationCache 状态</li>
-                    <li>applicationCache 方法</li>
-                    <li>applicationCache 事件</li>
-                </ul>
-        </ul>
+    <div id="cat-html5" class="step" data-x="500" data-y="7000" data-rotate="180" data-scale="6">
+        <h1>http cache decision tree</h1>
+        <img src="images/http-cache-decision-tree.png" alt="http cache decision tree">
     </div>
     <div class="step slide" data-x="3900" data-y="-100">
-        <h1>manifest TAG</h1>
-        <p class="text-small">&lt;html lang="zh-CN" <b>manifest='test.manifest'</b>&gt;</p>
-        <p class="text-small">MIME TYPE:text/cache-manifest</p>
-        <p class="text-small">引用cache.manifest的html文档会被默认包含进缓存清单</p>
+        <h1>简单的例子</h1>
+        <img src="images/http-cache-hierarchy.png" alt="http-cache-hierarchy">
     </div>
     <div class="step slide" data-x="4950" data-y="-100">
-        <h1>manifest文件规则</h1>
-        <p class="text-small">CACHE MANIFEST #文件头</p>
-        <p class="text-small">CACHE: #直接缓存的文件</p>
-        <p class="text-small">NETWORK: #需要时在线的文件</p>
-        <p class="text-small">FALLBACK: #在线资源离线替代资源</p>
-    </div>
-    <div class="step slide" data-x="6000" data-y="-100">
-        <h1>window.applicationCache.status</h1>
+        <h1>Check List</h1>
         <ul class="list-small">
-            <li>UNCACHED === 0 | 未缓存</li>
-            <li>IDLE === 1 | 空闲，缓存更新完毕</li>
-            <li>CHECKING === 2 | 检查缓存是否需要更新</li>
-            <li>DOWNLOADING === 3 | 正在更新缓存文件</li>
-            <li>UPDATEREADY === 4 | 中间态，更新完成</li>
-            <li>OBSOLETE === 5 | 缓存过期</li>
+            <li>使用同一域名提供相同的内容</li>
+            <li>为相应提供Etag标签</li>
+            <li>明确划分资源公私有属性</li>
+            <li>确定资源的最优缓存时间</li>
+            <li>变更范围最小化</li>
         </ul>
     </div>
+    <div class="step slide" data-x="6000" data-y="-100">
+        <h1>Varnish</h1>
+        <img style="float:left;margin-right:40px;" src="images/varnish-bunny.png" alt="varnish-bunny">
+        <div style="font-size:22px;">
+            Varnish Cache is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. Varnish Cache is really, really fast. It typically speeds up delivery with a factor of 300 - 1000x, depending on your architecture. A high level overview of what Varnish does can be seen in the video attached to this web page.
+        </div>
+    </div>
     <div class="step slide" data-x="7050" data-y="-100">
-        <h1>applicationCache API</h1>
+        <h1>Varnish VCL</h1>
         <ul class="list-small">
-            <li>cache.update() 手动更新缓存</li>
-            <li>cache.abort() 取消正在进行的缓存更新</li>
-            <li>cache.swapCache() 在本次回话中使用已经update过的缓存</li>
+            <li>vcl_recv函数</li>
+            <li>vcl_pipe函数</li>
+            <li>vcl_pass函数</li>
+            <li>vcl_hit函数</li>
+            <li>vcl_miss函数</li>
+            <li>vcl_fetch函数</li>
+            <li>vcl_deliver函数</li>
+            <li>vcl_timeout函数</li>
         </ul>
     </div>
     <div class="step slide" data-x="8100" data-y="-100">
-        <h1>applicationCache Event</h1>
+        <h1>参考资料</h1>
         <ul class="list-small">
-            <li>checking 手动更新缓存</li>
-            <li>noupdate manifest无更新</li>
-            <li>downloading 下载</li>
-            <li>progress 手动更新缓存</li>
-            <li>cached 缓存最新</li>
-            <li>updateready 更新成功</li>
-            <li>obsolete 404 410 取消缓存</li>
-            <li>error 出错</li>
+            <li><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html">HTTP 1.1 RFC 2616 - 13 Caching in HTTP</a></li>
+            <li><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">HTTP 1.1 RFC 2616 - 14.9 Cache-Control</a></li>
+            <li><a href="http://httparchive.org/trends.php#maxage0">http://httparchive.org/trends.php#maxage0</a></li>
+            <li><a href="https://www.w3.org/TR/WD-html40-970708/htmlweb.html">HTML and URLs </a></li>
+            <li><a href="http://www.mobify.com/blog/beginners-guide-to-http-cache-headers/">A Beginner's Guide to HTTP Cache Headers</a></li>
+            <li><a target="_blank" href="images/vcl.png">Varnish VCL flow</a></li>
         </ul>
     </div>
     <div id="overview" class="step" data-x="3000" data-y="1500" data-scale="10">
